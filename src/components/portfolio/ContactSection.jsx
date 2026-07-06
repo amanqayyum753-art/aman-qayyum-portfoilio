@@ -41,27 +41,36 @@ export default function ContactSection() {
       setError("Please fill in your name and email.");
       return;
     }
+
     setError("");
     setSubmitting(true);
+
     try {
-      // No backend server here — this is a standalone static build, so instead
-      // of saving to a database, we open the visitor's email client with
-      // everything pre-filled. This still gets the message to you directly.
-      const subject = `New project inquiry from ${formData.name}`;
-      const bodyLines = [
-        `Name: ${formData.name}`,
-        `Email: ${formData.email}`,
-        formData.phone ? `Phone: ${formData.phone}` : null,
-        formData.business_name ? `Business: ${formData.business_name}` : null,
-        formData.industry ? `Industry: ${formData.industry}` : null,
-        formData.biggest_problem ? `Biggest problem: ${formData.biggest_problem}` : null,
-        formData.message ? `\nMessage:\n${formData.message}` : null,
-      ].filter(Boolean);
-      const mailtoUrl = `mailto:amanqayyum753@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join("\n"))}`;
-      window.location.href = mailtoUrl;
+      const response = await fetch("https://formspree.io/f/xykqvypq", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          business_name: formData.business_name,
+          industry: formData.industry,
+          biggest_problem: formData.biggest_problem,
+          message: formData.message,
+          _subject: `New project inquiry from ${formData.name}`,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Form submit failed");
+      }
+
       setSubmitted(true);
     } catch (e) {
-      setError("Something went wrong. Please email directly instead.");
+      setError("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -241,7 +250,7 @@ export default function ContactSection() {
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-                            className="w-full px-4 py-2.5 border border-slate-200 rounded-md text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-[3px] focus:ring-blue-600/20 outline-none transition-all"
+                            className="w-full px-4 py-2.5 border border-slate-200 rounded-md text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-[3px] focus:ring-blue-100 outline-none transition-shadow"
                             placeholder="Jane Smith"
                             required
                           />
@@ -255,7 +264,7 @@ export default function ContactSection() {
                             type="email"
                             value={formData.email}
                             onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
-                            className="w-full px-4 py-2.5 border border-slate-200 rounded-md text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-[3px] focus:ring-blue-600/20 outline-none transition-all"
+                            className="w-full px-4 py-2.5 border border-slate-200 rounded-md text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-[3px] focus:ring-blue-100 outline-none transition-shadow"
                             placeholder="jane@business.com"
                             required
                           />
@@ -269,7 +278,7 @@ export default function ContactSection() {
                             type="text"
                             value={formData.business_name}
                             onChange={(e) => setFormData((p) => ({ ...p, business_name: e.target.value }))}
-                            className="w-full px-4 py-2.5 border border-slate-200 rounded-md text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-[3px] focus:ring-blue-600/20 outline-none transition-all"
+                            className="w-full px-4 py-2.5 border border-slate-200 rounded-md text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-[3px] focus:ring-blue-100 outline-none transition-shadow"
                             placeholder="Smith's HVAC"
                           />
                         </div>
@@ -282,7 +291,7 @@ export default function ContactSection() {
                             value={formData.message}
                             onChange={(e) => setFormData((p) => ({ ...p, message: e.target.value }))}
                             rows={3}
-                            className="w-full px-4 py-2.5 border border-slate-200 rounded-md text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-[3px] focus:ring-blue-600/20 outline-none transition-all resize-none"
+                            className="w-full px-4 py-2.5 border border-slate-200 rounded-md text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-[3px] focus:ring-blue-100 outline-none transition-shadow"
                             placeholder="Current site URL, timeline needs, budget range — whatever's helpful."
                           />
                         </div>
@@ -295,7 +304,7 @@ export default function ContactSection() {
                           type="button"
                           onClick={handleSubmit}
                           disabled={submitting}
-                          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-heading font-medium rounded-md hover:bg-blue-700 active:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed transition-colors duration-150 focus-ring text-base"
+                          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-heading font-medium rounded-md hover:bg-blue-700 active:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed transition-colors focus-ring"
                         >
                           {submitting ? (
                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
